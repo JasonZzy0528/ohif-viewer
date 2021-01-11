@@ -22,12 +22,13 @@ const DIST_DIR = path.join(__dirname, '../dist');
 const PUBLIC_DIR = path.join(__dirname, '../public');
 // ~~ Env Vars
 const HTML_TEMPLATE = process.env.HTML_TEMPLATE || 'index.html';
-const PUBLIC_URL = process.env.PUBLIC_URL || '/';
+// const PUBLIC_URL = process.env.PUBLIC_URL || '/';
 const APP_CONFIG = process.env.APP_CONFIG || 'config/default.js';
 const PROXY_TARGET = process.env.PROXY_TARGET;
 const PROXY_DOMAIN = process.env.PROXY_DOMAIN;
 const ENTRY_TARGET = process.env.ENTRY_TARGET || `${SRC_DIR}/index.js`;
 
+const PUBLIC_URL = './'
 module.exports = (env, argv) => {
   const baseConfig = webpackBase(env, argv, { SRC_DIR, DIST_DIR });
   const isProdBuild = process.env.NODE_ENV === 'production';
@@ -66,11 +67,11 @@ module.exports = (env, argv) => {
           from: `${PUBLIC_DIR}/config/google.js`,
           to: `${DIST_DIR}/google.js`,
         },
-        // Copy over and rename our target app config file
-        {
-          from: `${PUBLIC_DIR}/${APP_CONFIG}`,
-          to: `${DIST_DIR}/app-config.js`,
-        },
+        // // Copy over and rename our target app config file
+        // {
+        //   from: `${PUBLIC_DIR}/${APP_CONFIG}`,
+        //   to: `${DIST_DIR}/app-config.js`,
+        // },
       ]),
       // https://github.com/faceyspacey/extract-css-chunks-webpack-plugin#webpack-4-standalone-installation
       new ExtractCssChunksPlugin({

@@ -3,7 +3,7 @@ import { OidcProvider } from 'redux-oidc';
 import { I18nextProvider } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { HashRouter as Router } from 'react-router-dom';
 import { hot } from 'react-hot-loader/root';
 
 import OHIFCornerstoneExtension from '@ohif/extension-cornerstone';
@@ -55,6 +55,9 @@ import store from './store';
 import WhiteLabelingContext from './context/WhiteLabelingContext';
 import UserManagerContext from './context/UserManagerContext';
 import { AppProvider, useAppContext, CONTEXTS } from './context/AppContext';
+
+/** Customized styles */
+import './styles/index.css'
 
 /** ~~~~~~~~~~~~~ Application Setup */
 const commandsManagerConfig = {

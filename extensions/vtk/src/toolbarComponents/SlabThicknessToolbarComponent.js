@@ -7,7 +7,7 @@ import './slab-thickness-toolbar-button.styl';
 
 const SLIDER = {
   MIN: 0.1,
-  MAX: 1000,
+  MAX: 40,
   STEP: 0.1,
 };
 

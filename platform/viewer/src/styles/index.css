@@ -1,0 +1,133 @@
+:root {
+  --top-bar-height: 0px !important;
+  --default-color: #70939f !important;
+  --hover-color: #b0d2d6 !important;
+  --active-color: #68b0d0 !important;
+  --ui-border-color: rgba(0, 0, 0, 0.06) !important;
+  --ui-border-color-dark: rgba(0, 0, 0, 0.06) !important;
+  --ui-border-color-active: #b0d2d6;
+  --primary-background-color: white !important;
+  --box-background-color: #3e5975;
+  --ui-yellow: #e29e4a;
+  --ui-sky-blue: #6fbde2;
+  --ui-state-error: #ffcccc;
+  --ui-state-error-border: #993333;
+  --ui-state-error-text: #661111;
+  --ui-gray-light: #516873;
+  --ui-gray: #263340;
+  --ui-gray-dark: #16202b;
+  --ui-gray-darker: #151a1f;
+  --ui-gray-darkest: #14202a;
+  --text-color-active: #000000;
+  --text-primary-color: #70939f !important;
+  --text-secondary-color: #2669a7 !important;
+  --large-numbers-color: #6fbde2;
+  --text-disabled-color: #878787;
+  --input-background-color: #2c363f;
+  --input-placeholder-color--hover: #4d5a63;
+  --input-placeholder-color: #d3d3d3;
+  --table-hover-color: #2c363f;
+  --table-text-primary-color: #ffffff;
+  --table-text-secondary-color: #91b9cd;
+  --large-numbers-color: #6fbde2;
+  --state-error: #ffcccc;
+  --state-error-border: #ffcccc;
+  --state-error-text: #ffcccc;
+  --toolbar-height: 82px;
+}
+
+#root,
+body,
+html {
+  background-color: white;
+}
+
+.entry-header {
+  display: none;
+}
+.header-left-box {
+  float: left;
+}
+.header-logo-text > path {
+  fill: var(--text-primary-color) !important;
+}
+.research-use {
+  margin: 0 !important;
+}
+
+.dd-menu {
+  display: none;
+}
+
+.ToolbarRow .toolbar-button {
+  height: auto;
+}
+
+.ToolbarRow .pull-right {
+  display: none;
+}
+
+.roundedButton {
+  color: #ffffff !important;
+  border: none !important;
+}
+.study-browser {
+  background-color: transparent !important;
+}
+
+.study-browser .scrollable-study-thumbnails {
+  width: 100%;
+  padding: 0 4px 50px !important;
+  margin-right: 0 !important;
+}
+
+.main-content {
+  padding: 10px;
+}
+
+.main-content .viewport-container {
+  border: none !important;
+}
+
+.sidepanel .tableListHeader {
+  border-top: 1px solid var(--ui-border-color);
+  border-bottom: 1px solid var(--ui-border-color);
+  margin: 0 8px;
+  background-color: transparent !important;
+}
+.sidepanel .itemIndex {
+  background-color: transparent !important;
+}
+
+.sidepanel .measurementItem .rowActions {
+  background-color: transparent !important;
+}
+
+.editDescriptionDialog .header {
+  border-bottom-color: var(--primary-background-color);
+}
+.editDescriptionDialog .footer {
+  margin: 0 !important;
+}
+.notification-bar {
+  display: none !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .header-left-box {
+    display: none;
+  }
+  .ToolbarRow {
+    height: auto;
+    overflow-x: auto;
+  }
+  .ToolbarRow .btn-group {
+    display: none;
+  }
+  .ToolbarRow .expandableToolMenu {
+    display: none;
+  }
+  .FlexboxLayout {
+    height: calc(100% - var(--toolbar-height) - 16px) !important;
+  }
+}
