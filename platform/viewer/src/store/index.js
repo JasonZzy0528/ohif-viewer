@@ -21,7 +21,7 @@ reducers.oidc = oidcReducer;
 const rootReducer = combineReducers(reducers);
 const preloadedState = {
   ...localStorage.loadState(),
-  ...sessionStorage.loadState(),
+  // ...sessionStorage.loadState(),
 };
 
 const store = createStore(
