@@ -6,6 +6,24 @@ import classNames from 'classnames';
 
 import './Thumbnail.styl';
 
+function detectMob() {
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i,
+  ];
+
+  return toMatch.some(toMatchItem => {
+    return navigator.userAgent.match(toMatchItem);
+  });
+}
+
+const isMobile = detectMob();
+
 function ThumbnailFooter({
   SeriesDescription,
   SeriesNumber,
@@ -76,7 +94,7 @@ function Thumbnail(props) {
       displaySetInstanceUID,
       type: 'thumbnail', // Has to match `dropTarget`'s type
     },
-    canDrag: function(monitor) {
+    canDrag: function (monitor) {
       return supportsDrag;
     },
   });
@@ -86,7 +104,7 @@ function Thumbnail(props) {
 
   return (
     <div
-      ref={drag}
+      ref={isMobile ? null : drag}
       className={classNames('thumbnail', { active: active })}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
@@ -112,7 +130,7 @@ function Thumbnail(props) {
   );
 }
 
-const noop = () => {};
+const noop = () => { };
 
 Thumbnail.propTypes = {
   supportsDrag: PropTypes.bool,

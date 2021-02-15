@@ -124,8 +124,8 @@ html {
   .ToolbarRow .btn-group {
     display: none;
   }
-  .ToolbarRow .expandableToolMenu {
-    display: none;
+  .tooltip-toolbar-overlay .toolbar-button {
+    min-width: 33%;
   }
   .FlexboxLayout {
     height: calc(100% - var(--toolbar-height) - 16px) !important;

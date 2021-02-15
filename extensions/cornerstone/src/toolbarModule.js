@@ -72,24 +72,6 @@ const definitions = [
     commandOptions: { toolName: 'Pan' },
   },
   {
-    id: 'Length',
-    label: 'Length',
-    icon: 'measure-temp',
-    //
-    type: TOOLBAR_BUTTON_TYPES.SET_TOOL_ACTIVE,
-    commandName: 'setToolActive',
-    commandOptions: { toolName: 'Length' },
-  },
-  {
-    id: 'ArrowAnnotate',
-    label: 'Annotate',
-    icon: 'measure-non-target',
-    //
-    type: TOOLBAR_BUTTON_TYPES.SET_TOOL_ACTIVE,
-    commandName: 'setToolActive',
-    commandOptions: { toolName: 'ArrowAnnotate' },
-  },
-  {
     id: 'Angle',
     label: 'Angle',
     icon: 'angle-left',
@@ -97,24 +79,6 @@ const definitions = [
     type: TOOLBAR_BUTTON_TYPES.SET_TOOL_ACTIVE,
     commandName: 'setToolActive',
     commandOptions: { toolName: 'Angle' },
-  },
-  {
-    id: 'Reset',
-    label: 'Reset',
-    icon: 'reset',
-    //
-    type: TOOLBAR_BUTTON_TYPES.COMMAND,
-    commandName: 'resetViewport',
-  },
-  {
-    id: 'Cine',
-    label: 'CINE',
-    icon: 'youtube',
-    //
-    type: TOOLBAR_BUTTON_TYPES.BUILT_IN,
-    options: {
-      behavior: TOOLBAR_BUTTON_BEHAVIORS.CINE,
-    },
   },
   {
     id: 'More',
@@ -225,6 +189,42 @@ const definitions = [
           behavior: TOOLBAR_BUTTON_BEHAVIORS.DOWNLOAD_SCREEN_SHOT,
           togglable: true,
         },
+      },
+      {
+        id: 'ArrowAnnotate',
+        label: 'Annotate',
+        icon: 'measure-non-target',
+        //
+        type: TOOLBAR_BUTTON_TYPES.SET_TOOL_ACTIVE,
+        commandName: 'setToolActive',
+        commandOptions: { toolName: 'ArrowAnnotate' },
+      },
+      {
+        id: 'Length',
+        label: 'Length',
+        icon: 'measure-temp',
+        //
+        type: TOOLBAR_BUTTON_TYPES.SET_TOOL_ACTIVE,
+        commandName: 'setToolActive',
+        commandOptions: { toolName: 'Length' },
+      },
+      {
+        id: 'Cine',
+        label: 'CINE',
+        icon: 'youtube',
+        //
+        type: TOOLBAR_BUTTON_TYPES.BUILT_IN,
+        options: {
+          behavior: TOOLBAR_BUTTON_BEHAVIORS.CINE,
+        },
+      },
+      {
+        id: 'Reset',
+        label: 'Reset',
+        icon: 'reset',
+        //
+        type: TOOLBAR_BUTTON_TYPES.COMMAND,
+        commandName: 'resetViewport',
       },
     ],
   },
