@@ -79,7 +79,7 @@ export class StudyMetadata extends Metadata {
     Object.defineProperty(this, 'studyInstanceUID', {
       configurable: false,
       enumerable: false,
-      get: function() {
+      get: function () {
         return this.getStudyInstanceUID();
       },
     });
@@ -120,6 +120,12 @@ export class StudyMetadata extends Metadata {
         SeriesNumber: seriesData.SeriesNumber,
         Modality: seriesData.Modality,
       });
+
+      if (seriesData.error) {
+        displaySet.setAttributes({
+          error: seriesData.error,
+        });
+      }
 
       displaySets.push(displaySet);
 
@@ -450,7 +456,7 @@ export class StudyMetadata extends Metadata {
           if (
             displaySetI.SeriesDate &&
             `${displaySetI.SeriesDate}${displaySetI.SeriesTime}` <
-              seriesDateTime
+            seriesDateTime
           ) {
             insertIndex = i;
             break;

@@ -28,6 +28,7 @@ function StudyBrowser(props) {
                 SeriesDescription,
                 SeriesNumber,
                 stackPercentComplete,
+                error,
               } = thumb;
 
               return (
@@ -57,6 +58,7 @@ function StudyBrowser(props) {
                       displaySetInstanceUID
                     )}
                     onDoubleClick={onThumbnailDoubleClick}
+                    seriesError={error}
                   />
                 </div>
               );
@@ -68,7 +70,7 @@ function StudyBrowser(props) {
   );
 }
 
-const noop = () => {};
+const noop = () => { };
 
 StudyBrowser.propTypes = {
   studies: PropTypes.arrayOf(
@@ -84,6 +86,7 @@ StudyBrowser.propTypes = {
           SeriesDescription: PropTypes.string,
           SeriesNumber: PropTypes.number,
           stackPercentComplete: PropTypes.number,
+          error: PropTypes.string,
         })
       ),
     })

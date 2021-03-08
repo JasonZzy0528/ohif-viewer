@@ -22,18 +22,18 @@ function mapStudySeries(series) {
   return series.map(series => getSeriesInfo(series).SeriesInstanceUID);
 }
 
-function attachSeriesLoader(server, study, seriesLoader) {
-  study.seriesLoader = Object.freeze({
-    hasNext() {
-      return seriesLoader.hasNext();
-    },
-    async next() {
-      const series = await seriesLoader.next();
-      await addInstancesToStudy(server, study, series.sopInstances);
-      return study.seriesMap[series.seriesInstanceUID];
-    },
-  });
-}
+// function attachSeriesLoader(server, study, seriesLoader) {
+//   study.seriesLoader = Object.freeze({
+//     hasNext() {
+//       return seriesLoader.hasNext();
+//     },
+//     async next() {
+//       const series = await seriesLoader.next();
+//       await addInstancesToStudy(server, study, series.sopInstances);
+//       return study.seriesMap[series.seriesInstanceUID];
+//     },
+//   });
+// }
 
 /**
  * Creates an immutable series loader object which loads each series sequentially using the iterator interface
@@ -69,6 +69,11 @@ function makeSeriesAsyncLoader(
  * It loads the one series and then append to seriesLoader the others to be consumed/loaded
  */
 export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader {
+  constructor() {
+    super(...arguments);
+    this.seriesInstanceUIDsMap = null;
+    this.seriesData = null;
+  }
   configLoad() {
     const { server } = this;
 
@@ -106,6 +111,7 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
   }
 
   async preLoad() {
+    const _self = this;
     const preLoaders = this.getPreLoaders();
 
     // seriesData is the result of the QIDO-RS Search For Series request
@@ -117,7 +123,8 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
       sortingCriteria.seriesSortCriteria.seriesInfoSortingCriteria
     );
     const seriesInstanceUIDsMap = mapStudySeries(seriesSorted);
-
+    _self.seriesInstanceUIDsMap = seriesInstanceUIDsMap;
+    _self.seriesData = seriesData;
     return {
       seriesInstanceUIDsMap,
       seriesData,
@@ -133,24 +140,55 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
       preLoadData.seriesInstanceUIDsMap
     );
 
-    const firstSeries = await seriesAsyncLoader.next();
-
-    return {
-      sopInstances: firstSeries.sopInstances,
-      asyncLoader: seriesAsyncLoader,
-      seriesData: preLoadData.seriesData,
-    };
+    let firstSeries;
+    let hasNext = true;
+    let idx = 0;
+    while (!firstSeries && hasNext) {
+      try {
+        firstSeries = await seriesAsyncLoader.next();
+      } catch (err) {
+        if (err.status === 404) {
+          if (!seriesAsyncLoader.hasNext() && err.status === 404) {
+            hasNext = false;
+          }
+          preLoadData.seriesData[idx].error = 404;
+        } else {
+          throw err;
+        }
+      }
+      idx++;
+    }
+    if (firstSeries) {
+      return {
+        sopInstances: firstSeries.sopInstances,
+        asyncLoader: seriesAsyncLoader,
+        seriesData: preLoadData.seriesData,
+      };
+    } else {
+      return {
+        sopInstances: [],
+        asyncLoader: seriesAsyncLoader,
+        seriesData: preLoadData.seriesData,
+      };
+    }
   }
 
   async posLoad(loadData) {
-    const { server } = this;
+    const _self = this;
+    const { server } = _self;
 
     const { sopInstances, asyncLoader, seriesData } = loadData;
 
     const study = await createStudyFromSOPInstanceList(server, sopInstances);
 
     // TODO: Should this be in a helper
-    const seriesDataNaturalized = seriesData.map(naturalizeDataset);
+    const seriesDataNaturalized = seriesData.map(data => {
+      const res = naturalizeDataset(data);
+      if (data.error) {
+        res.error = data.error;
+      }
+      return res;
+    });
 
     seriesDataNaturalized.forEach((series, idx) => {
       const seriesDataFromQIDO = {
@@ -160,6 +198,9 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
         Modality: series.Modality,
         instances: [],
       };
+      if (series.error) {
+        seriesDataFromQIDO.error = series.error;
+      }
 
       if (study.series[idx]) {
         study.series[idx] = Object.assign(
@@ -174,9 +215,38 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
     });
 
     if (asyncLoader.hasNext()) {
-      attachSeriesLoader(server, study, asyncLoader);
+      _self.attachSeriesLoader(server, study, asyncLoader);
     }
 
     return study;
+  }
+
+  attachSeriesLoader(server, study, seriesLoader) {
+    const _self = this;
+    study.seriesLoader = Object.freeze({
+      hasNext() {
+        return seriesLoader.hasNext();
+      },
+      async next() {
+        const seriesInstanceUID = [..._self.seriesInstanceUIDsMap].shift();
+        try {
+          const series = await seriesLoader.next();
+          await addInstancesToStudy(server, study, series.sopInstances);
+          return study.seriesMap[series.seriesInstanceUID];
+        } catch (err) {
+          if (err.status === 404) {
+            const idx = study.displaySets.findIndex(
+              imageSet =>
+                imageSet.getAttribute('SeriesInstanceUID') === seriesInstanceUID
+            );
+            if (idx !== -1) {
+              study.displaySets[idx].setAttribute('error', 404);
+            }
+          } else {
+            throw err;
+          }
+        }
+      },
+    });
   }
 }

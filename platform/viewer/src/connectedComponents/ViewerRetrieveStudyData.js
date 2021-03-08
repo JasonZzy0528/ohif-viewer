@@ -143,7 +143,7 @@ const _showUserMessage = (queryParamApplied, message, dialog = {}) => {
     return;
   }
 
-  const { show: showUserMessage = () => {} } = dialog;
+  const { show: showUserMessage = () => { } } = dialog;
   showUserMessage({
     message,
   });
@@ -312,9 +312,11 @@ function ViewerRetrieveStudyData({
     const loadNextSeries = async () => {
       if (!seriesLoader.hasNext()) return;
       const series = await seriesLoader.next();
-      _addSeriesToStudy(studyMetadata, series);
-      forceRerender();
-      return loadNextSeries();
+      if (series) {
+        _addSeriesToStudy(studyMetadata, series);
+        forceRerender();
+        return loadNextSeries();
+      }
     };
 
     const concurrentRequestsAllowed =

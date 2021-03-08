@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useDrag } from 'react-dnd';
 import ImageThumbnail from './ImageThumbnail';
 import classNames from 'classnames';
+import ErrorIndicator from './ErrorIndicator';
 
 import './Thumbnail.styl';
 
@@ -74,6 +75,7 @@ function Thumbnail(props) {
     displaySetInstanceUID,
     imageId,
     imageSrc,
+    seriesError,
     InstanceNumber,
     numImageFrames,
     SeriesDescription,
@@ -120,11 +122,12 @@ function Thumbnail(props) {
         />
       )}
       {/* SHOW TEXT ALTERNATIVE */}
-      {!hasImage && hasAltText && (
+      {!seriesError && !hasImage && hasAltText && (
         <div className={'alt-image-text p-x-1'}>
           <h1>{altImageText}</h1>
         </div>
       )}
+      {seriesError && <ErrorIndicator error={seriesError} />}
       {ThumbnailFooter(props)}
     </div>
   );
@@ -142,11 +145,12 @@ Thumbnail.propTypes = {
   error: PropTypes.bool,
   active: PropTypes.bool,
   stackPercentComplete: PropTypes.number,
+  seriesError: PropTypes.string,
   /**
-  altImageText will be used when no imageId or imageSrc is provided.
-It will be displayed inside the <div>. This is useful when it is difficult
-  to make a preview for a type of DICOM series (e.g. DICOM-SR)
-  */
+    altImageText will be used when no imageId or imageSrc is provided.
+  It will be displayed inside the <div>. This is useful when it is difficult
+    to make a preview for a type of DICOM series (e.g. DICOM-SR)
+    */
   altImageText: PropTypes.string,
   SeriesDescription: PropTypes.string,
   SeriesNumber: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

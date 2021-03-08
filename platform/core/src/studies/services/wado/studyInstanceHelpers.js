@@ -10,6 +10,16 @@ import getReferencedSeriesSequence from './getReferencedSeriesSequence';
  * @param {Object} aSopInstance a SOP Instance from which study information will be added
  */
 function createStudy(server, aSopInstance) {
+  if (!aSopInstance) {
+    return {
+      series: [],
+      seriesMap: Object.create(null),
+      seriesLoader: null,
+      wadoUriRoot: server.wadoUriRoot,
+      wadoRoot: server.wadoRoot,
+      qidoRoot: server.qidoRoot,
+    };
+  }
   // TODO: Pass a reference ID to the server instead of including the URLs here
   return {
     series: [],
@@ -192,18 +202,23 @@ async function makeSOPInstance(server, study, instance) {
  */
 async function addInstancesToStudy(server, study, sopInstanceList) {
   return Promise.all(
-    sopInstanceList.map(function(sopInstance) {
+    sopInstanceList.map(function (sopInstance) {
       return makeSOPInstance(server, study, sopInstance);
     })
   );
 }
 
 const createStudyFromSOPInstanceList = async (server, sopInstanceList) => {
-  if (Array.isArray(sopInstanceList) && sopInstanceList.length > 0) {
-    const firstSopInstance = sopInstanceList[0];
-    const study = createStudy(server, firstSopInstance);
-    await addInstancesToStudy(server, study, sopInstanceList);
-    return study;
+  if (Array.isArray(sopInstanceList)) {
+    if (sopInstanceList.length > 0) {
+      const firstSopInstance = sopInstanceList[0];
+      const study = createStudy(server, firstSopInstance);
+      await addInstancesToStudy(server, study, sopInstanceList);
+      return study;
+    } else {
+      const study = createStudy(server, null);
+      return study;
+    }
   }
   throw new Error('Failed to create study out of provided SOP instance list');
 };

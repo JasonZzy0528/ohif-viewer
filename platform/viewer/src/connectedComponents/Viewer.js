@@ -320,11 +320,11 @@ class Viewer extends Component {
                   activeIndex={this.props.activeViewportIndex}
                 />
               ) : (
-                  <ConnectedStudyBrowser
-                    studies={this.state.thumbnails}
-                    studyMetadata={this.props.studies}
-                  />
-                )}
+                <ConnectedStudyBrowser
+                  studies={this.state.thumbnails}
+                  studyMetadata={this.props.studies}
+                />
+              )}
             </SidePanel>
           </ErrorBoundaryDialog>
 
@@ -347,7 +347,9 @@ class Viewer extends Component {
                   viewports={this.props.viewports}
                   studies={this.props.studies}
                   activeIndex={this.props.activeViewportIndex}
-                  activeViewport={this.props.viewports[this.props.activeViewportIndex]}
+                  activeViewport={
+                    this.props.viewports[this.props.activeViewportIndex]
+                  }
                   getActiveViewport={this._getActiveViewport}
                 />
               )}
@@ -382,6 +384,7 @@ const _mapStudiesToThumbnails = function (studies) {
         InstanceNumber,
         numImageFrames,
         SeriesNumber,
+        error,
       } = displaySet;
 
       let imageId;
@@ -399,7 +402,18 @@ const _mapStudiesToThumbnails = function (studies) {
       } else {
         altImageText = displaySet.Modality ? displaySet.Modality : 'UN';
       }
-
+      if (error) {
+        return {
+          imageId,
+          altImageText,
+          displaySetInstanceUID,
+          SeriesDescription,
+          InstanceNumber,
+          numImageFrames,
+          SeriesNumber,
+          error,
+        };
+      }
       return {
         imageId,
         altImageText,
