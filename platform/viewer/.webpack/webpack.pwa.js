@@ -88,12 +88,12 @@ module.exports = (env, argv) => {
       }),
       // No longer maintained; but good for generating icons + manifest
       // new FaviconsWebpackPlugin( path.join(PUBLIC_DIR, 'assets', 'icons-512.png')),
-      new InjectManifest({
-        swDest: 'sw.js',
-        swSrc: path.join(SRC_DIR, 'service-worker.js'),
-        // Increase the limit to 4mb:
-        // maximumFileSizeToCacheInBytes: 4 * 1024 * 1024
-      }),
+      // new InjectManifest({
+      //   swDest: 'sw.js',
+      //   swSrc: path.join(SRC_DIR, 'service-worker.js'),
+      // Increase the limit to 4mb:
+      // maximumFileSizeToCacheInBytes: 4 * 1024 * 1024
+      // }),
     ],
     // https://webpack.js.org/configuration/dev-server/
     devServer: {

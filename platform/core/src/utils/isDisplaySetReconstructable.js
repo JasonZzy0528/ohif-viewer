@@ -116,7 +116,7 @@ function processSingleframe(instances) {
 }
 
 function _isSameOrientation(iop1, iop2) {
-  if (iop1 === undefined || !iop2 === undefined) {
+  if (iop1 === undefined || iop2 === undefined) {
     return;
   }
 
