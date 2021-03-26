@@ -4,27 +4,27 @@ import { ToolbarButton } from '@ohif/ui';
 
 import './ToolbarButton.styl';
 
-const OverlayToolbarButton = (props) => {
-  const { toolbarClickCallback, button } = props
+const OverlayToolbarButton = props => {
+  const { toolbarClickCallback, button } = props;
   const { id } = button;
-  const [isVisible, setIsVisible] = useState(true)
+  const [isVisible, setIsVisible] = useState(true);
 
   const onClick = useCallback(() => {
-    setIsVisible(!isVisible)
-    toolbarClickCallback(button, !isVisible)
-  }, [isVisible, toolbarClickCallback, button])
+    setIsVisible(!isVisible);
+    toolbarClickCallback(button, !isVisible);
+  }, [isVisible, toolbarClickCallback, button]);
 
   return (
     <ToolbarButton
       key={id}
-      label={isVisible ? 'Invisible' : ' Visible '}
+      label={isVisible ? 'Annotation invisible' : ' Annotation visible '}
       icon={isVisible ? 'eye-closed' : 'eye'}
       onClick={onClick}
       isActive={false}
       className={'toolbar-button custom-toolbar-button-visible'}
     />
   );
-}
+};
 
 OverlayToolbarButton.propTypes = {
   parentContext: PropTypes.object.isRequired,

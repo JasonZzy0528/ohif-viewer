@@ -1,11 +1,11 @@
 const defaultState = {
   windowLevelData: {
-    1: { description: 'Soft tissue', window: '550', level: '40' },
-    2: { description: 'Lung', window: '150', level: '-600' },
-    3: { description: 'Liver', window: '150', level: '90' },
-    4: { description: 'Bone', window: '2500', level: '480' },
-    5: { description: 'Brain', window: '80', level: '40' },
-    6: { description: 'Trest', window: '1', level: '1' },
+    1: { description: 'CT 1', window: '35', level: '70' },
+    2: { description: 'CT 2', window: '40', level: '40' },
+    3: { description: 'CT 3', window: '120', level: '90' },
+    4: { description: '', window: '', level: '' },
+    5: { description: '', window: '', level: '' },
+    6: { description: '', window: '', level: '' },
     7: { description: '', window: '', level: '' },
     8: { description: '', window: '', level: '' },
     9: { description: '', window: '', level: '' },

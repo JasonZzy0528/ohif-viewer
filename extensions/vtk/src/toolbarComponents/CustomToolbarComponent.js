@@ -1,11 +1,12 @@
 /* eslint-disable */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Range, Checkbox, OldSelect } from '@ohif/ui';
 
 import { KEYS, ACTIONS, EXTENSION_NAME } from '../utils/reduxConstants'
+import { _isDisplaySetReconstructable } from './VTKMPRToolbarButton'
 import './slab-thickness-toolbar-button.styl';
 
 const SLIDER = {
@@ -23,7 +24,7 @@ ToolbarLabel.propTypes = {
   label: PropTypes.string.isRequired,
 };
 
-const ToolbarSlider = props => {
+const ToolbarComponentSlider = props => {
   const { value, min, max } = props;
 
   const onChange = (evt) => {
@@ -59,7 +60,7 @@ const ToolbarSlider = props => {
   );
 };
 
-ToolbarSlider.propTypes = {
+ToolbarComponentSlider.propTypes = {
   value: PropTypes.number.isRequired,
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
@@ -79,61 +80,6 @@ const _getClassNames = (isActive, className) => {
   return classnames('toolbar-button', 'slab-thickness', className, {
     active: isActive,
   });
-};
-
-const _applySlabThickness = (
-  value,
-  modeChecked,
-  toolbarClickCallback,
-  button,
-  delay
-) => {
-  if (!modeChecked || !toolbarClickCallback) {
-    return;
-  }
-
-  const { actionButton } = button;
-
-  const generateOperation = (operation, value) => {
-    // Combine slider value into slider operation
-    const generatedOperation = { ...operation };
-    generatedOperation.commandOptions = {
-      ...operation.commandOptions,
-      slabThickness: value,
-    };
-
-    return generatedOperation;
-  };
-  const operation = generateOperation(actionButton, value);
-  if (delay) {
-    setTimeout(() => toolbarClickCallback(operation), 1000)
-  } else {
-    toolbarClickCallback(operation)
-  }
-};
-
-const _applyModeOperation = (
-  operation,
-  modeChecked,
-  toolbarClickCallback,
-  button,
-  delay
-) => {
-  // in case modeChecked has not being triggered by user yet
-  if (typeof modeChecked !== 'boolean') {
-    return;
-  }
-
-  const { deactivateButton } = button;
-
-  const _operation = modeChecked ? operation : deactivateButton;
-  if (toolbarClickCallback && _operation) {
-    if (delay) {
-      setTimeout(() => toolbarClickCallback(_operation), 1000)
-    } else {
-      toolbarClickCallback(_operation);
-    }
-  }
 };
 
 const _getInitialState = (currentSelectedOption, extensionData) => {
@@ -182,7 +128,7 @@ const _setExtensionData = ({ id, value, modeChecked }) => {
   }
 }
 
-function SlabThicknessToolbarComponent({
+function CustomToolbarComponent({
   parentContext,
   toolbarClickCallback,
   button,
@@ -192,11 +138,23 @@ function SlabThicknessToolbarComponent({
 }) {
   const vtkExtensionData = useSelector(state => state.extensions[EXTENSION_NAME])
   const dispatch = useDispatch()
+  const { viewportSpecificData, activeViewportIndex } = useSelector(state => {
+    const { viewports = {} } = state;
+    const { viewportSpecificData, activeViewportIndex } = viewports;
+
+    return {
+      viewportSpecificData,
+      activeViewportIndex,
+    };
+  });
+
+  const isVisible = _isDisplaySetReconstructable(
+    viewportSpecificData,
+    activeViewportIndex
+  );
 
   const currentSelectedOption = _getInitialtSelectedOption(button, vtkExtensionData);
   const [state, setState] = useState(_getInitialState(currentSelectedOption, vtkExtensionData));
-  const [isMounted, setIsMounted] = useState(false)
-  const prevIsMounted = useRef(isMounted)
   const { label, operationButtons } = button;
   const _className = _getClassNames(isActive, className);
   const selectOptions = _getSelectOptions(button);
@@ -226,93 +184,45 @@ function SlabThicknessToolbarComponent({
   }
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (isMounted) {
-      if (!prevIsMounted.current) {
-        _applyModeOperation(
-          state.operation,
-          state.modeChecked,
-          toolbarClickCallback,
-          button,
-          true
-        );
-      } else {
-        _applyModeOperation(
-          state.operation,
-          state.modeChecked,
-          toolbarClickCallback,
-          button
-        );
-      }
-    }
-  }, [state.modeChecked, state.operation, isMounted]);
-
-  useEffect(() => {
-    if (isMounted) {
-      if (!prevIsMounted.current) {
-        _applySlabThickness(
-          state.value,
-          state.modeChecked,
-          toolbarClickCallback,
-          button,
-          true
-        );
-      } else {
-        _applySlabThickness(
-          state.value,
-          state.modeChecked,
-          toolbarClickCallback,
-          button
-        );
-      }
-      const value = state.value
-      const id = state.operation.id
-      const modeChecked = state.modeChecked
-      dispatch(_setExtensionData({ id, value, modeChecked }))
-    }
-  }, [
-    state.operation,
-    state.modeChecked,
-    state.value,
-    isMounted
-  ]);
-
-  useEffect(() => {
-    prevIsMounted.current = isMounted
-  }, [isMounted])
+    const value = state.value
+    const id = state.operation.id
+    const modeChecked = state.modeChecked
+    dispatch(_setExtensionData({ id, value, modeChecked }))
+  }, [state.modeChecked, state.operation, state.value]);
 
   return (
-    <div className={_className}>
-      <div className="container">
-        <ToolbarSlider
-          value={state.value}
-          min={state.sliderMin}
-          max={state.sliderMax}
-          onChange={onChangeSlider}
-        />
-        <ToolbarLabel key="toolbar-label" label={label} />
-      </div>
-      <div className="controller">
-        <Checkbox
-          label="mode"
-          checked={state.modeChecked}
-          onChange={onChangeCheckbox}
-        ></Checkbox>
-        <OldSelect
-          key="toolbar-select"
-          options={selectOptions}
-          value={state.operation.id}
-          onChange={onChangeSelect}
-        ></OldSelect>
-      </div>
-    </div>
+    <React.Fragment>
+      {isVisible && (
+        <div className={_className}>
+          <div className="container">
+            <ToolbarComponentSlider
+              value={state.value}
+              min={state.sliderMin}
+              max={state.sliderMax}
+              onChange={onChangeSlider}
+            />
+            <ToolbarLabel key="toolbar-label" label={label} />
+          </div>
+          <div className="controller">
+            <Checkbox
+              label="mode"
+              checked={state.modeChecked}
+              onChange={onChangeCheckbox}
+            ></Checkbox>
+            <OldSelect
+              key="toolbar-select"
+              options={selectOptions}
+              value={state.operation.id}
+              onChange={onChangeSelect}
+            ></OldSelect>
+          </div>
+        </div>
+      )}
+    </React.Fragment>
   );
 }
 
-SlabThicknessToolbarComponent.propTypes = {
+CustomToolbarComponent.propTypes = {
   parentContext: PropTypes.object.isRequired,
   toolbarClickCallback: PropTypes.func.isRequired,
   button: PropTypes.object.isRequired,
@@ -321,4 +231,4 @@ SlabThicknessToolbarComponent.propTypes = {
   className: PropTypes.string,
 };
 
-export default SlabThicknessToolbarComponent;
+export default CustomToolbarComponent;

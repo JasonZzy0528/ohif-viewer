@@ -29,15 +29,16 @@ import OHIFDicomSegmentationExtension from '@ohif/extension-dicom-segmentation';
 import OHIFDicomRtExtension from '@ohif/extension-dicom-rt';
 import OHIFDicomMicroscopyExtension from '@ohif/extension-dicom-microscopy';
 import OHIFDicomPDFExtension from '@ohif/extension-dicom-pdf';
-import OHIFViewportOverlayExtension from '../../../extensions/dicom-viewport-overlay'
+import OHIFViewportOverlayExtension from '../../../extensions/dicom-viewport-overlay';
+import OHIFWindowLevelPresetsExtension from '../../../extensions/dicom-window-level-presets';
 //import OHIFDicomTagBrowserExtension from '@ohif/extension-dicom-tag-browser';
 // Add this for Debugging purposes:
 //import OHIFDebuggingExtension from '@ohif/extension-debugging';
 import { version } from '../package.json';
 const CONSTANTS = {
   VIEWER_CONFIG: 'VIEWER_CONFIG',
-  READY_TO_COMMUNICATE: 'READY_TO_COMMUNICATE'
-}
+  READY_TO_COMMUNICATE: 'READY_TO_COMMUNICATE',
+};
 /*
  * Default Settings
  */
@@ -51,11 +52,11 @@ if (window && window.parent) {
   // pass config through cross document messaging
   window.addEventListener('message', event => {
     if (event.origin !== window.location.origin) {
-      return
+      return;
     }
     // render app when config is ready
-    if (event.data && (event.data.type === CONSTANTS.VIEWER_CONFIG)) {
-      config = event.data.config
+    if (event.data && event.data.type === CONSTANTS.VIEWER_CONFIG) {
+      config = event.data.config;
 
       const appProps = {
         config,
@@ -66,7 +67,8 @@ if (window && window.parent) {
           OHIFDicomPDFExtension,
           OHIFDicomSegmentationExtension,
           OHIFDicomRtExtension,
-          OHIFViewportOverlayExtension
+          OHIFViewportOverlayExtension,
+          OHIFWindowLevelPresetsExtension,
           //OHIFDebuggingExtension,
           //OHIFDicomTagBrowserExtension,
         ],
@@ -78,8 +80,8 @@ if (window && window.parent) {
       /** Render */
       ReactDOM.render(app, document.getElementById('root'));
     }
-    return
-  })
+    return;
+  });
 
-  window.parent.postMessage({ type: CONSTANTS.READY_TO_COMMUNICATE })
+  window.parent.postMessage({ type: CONSTANTS.READY_TO_COMMUNICATE });
 }

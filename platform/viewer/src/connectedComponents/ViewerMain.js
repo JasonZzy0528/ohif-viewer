@@ -6,6 +6,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import memoize from 'lodash/memoize';
 import _values from 'lodash/values';
+import cornerstone from 'cornerstone-core';
+
+import { commandsManager } from '../App';
 
 var values = memoize(_values);
 
@@ -24,7 +27,11 @@ class ViewerMain extends Component {
 
     this.state = {
       displaySets: [],
+      enabledElement: null,
     };
+
+    this.listenOnEnabledElement = this.listenOnEnabledElement.bind(this);
+    this.listenOnRendered = this.listenOnRendered.bind(this);
   }
 
   getDisplaySets(studies) {
@@ -67,17 +74,81 @@ class ViewerMain extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    const _self = this;
     const prevViewportAmount = prevProps.layout.viewports.length;
     const viewportAmount = this.props.layout.viewports.length;
     const isVtk = this.props.layout.viewports.some(vp => !!vp.vtk);
 
-    if (
-      this.props.studies !== prevProps.studies ||
-      (viewportAmount !== prevViewportAmount && !isVtk)
-    ) {
-      const displaySets = this.getDisplaySets(this.props.studies);
-      this.setState({ displaySets }, this.fillEmptyViewportPanes);
+    try {
+      const prevViewportIndex = prevProps.activeViewportIndex;
+      const currentViewportIndex = _self.props.activeViewportIndex;
+      const prevSeriesInstanceUID =
+        prevProps.viewports.viewportSpecificData[prevViewportIndex] &&
+        prevProps.viewports.viewportSpecificData[prevViewportIndex]
+          .SeriesInstanceUID;
+      const currentSeriesInstanceUID =
+        _self.props.viewports.viewportSpecificData[currentViewportIndex] &&
+        _self.props.viewports.viewportSpecificData[currentViewportIndex]
+          .SeriesInstanceUID;
+      if (
+        this.props.studies !== prevProps.studies ||
+        (viewportAmount !== prevViewportAmount && !isVtk)
+      ) {
+        const displaySets = this.getDisplaySets(this.props.studies);
+        this.setState({ displaySets }, this.fillEmptyViewportPanes);
+      }
+      if (
+        currentSeriesInstanceUID &&
+        prevSeriesInstanceUID !== currentSeriesInstanceUID &&
+        _self.props.viewports.viewportSpecificData[currentViewportIndex]
+          .Modality === 'CT'
+      ) {
+        // https://github.com/cornerstonejs/cornerstone/issues/328
+        if (!_self.state.enabledElement) {
+          cornerstone.events.addEventListener(
+            'cornerstoneelementenabled',
+            _self.listenOnEnabledElement
+          );
+        } else {
+          _self.listenOnEnabledElement();
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      // pass
     }
+  }
+
+  listenOnRendered(evt) {
+    const _self = this;
+    const element = evt.detail.element;
+    element.removeEventListener(
+      'cornerstoneimagerendered',
+      _self.listenOnRendered
+    );
+    commandsManager.runCommand('setWindowLevel', {
+      viewports: _self.props.viewports,
+      window: 35,
+      level: 70,
+    });
+  }
+
+  listenOnEnabledElement(evt) {
+    const _self = this;
+    const enabledElement = evt
+      ? evt.detail.element
+      : _self.state.enabledElement;
+    if (enabledElement !== _self.state.enabledElement) {
+      _self.setState({ enabledElement });
+    }
+    enabledElement.removeEventListener(
+      'cornerstoneimagerendered',
+      _self.listenOnRendered
+    );
+    enabledElement.addEventListener(
+      'cornerstoneimagerendered',
+      _self.listenOnRendered
+    );
   }
 
   fillEmptyViewportPanes = () => {

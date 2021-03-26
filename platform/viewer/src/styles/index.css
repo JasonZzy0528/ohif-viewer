@@ -41,22 +41,29 @@ body,
 html {
   background-color: white;
 }
-
 .entry-header {
-  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 !important;
+  z-index: 1000;
 }
+
 .header-left-box {
   float: left;
+  display: none !important;
 }
+
 .header-logo-text > path {
   fill: var(--text-primary-color) !important;
 }
 .research-use {
+  display: none;
   margin: 0 !important;
 }
 
-.dd-menu {
-  display: none;
+.is-mobile + .ToolbarRow {
+  margin-top: 10px;
 }
 
 .ToolbarRow .toolbar-button {
@@ -111,6 +118,13 @@ html {
 }
 .notification-bar {
   display: none !important;
+}
+.OHIFModal .footer {
+  border-color: #000 !important;
+}
+
+.GeneralPreferences .language-select {
+  color: #000 !important;
 }
 
 @media only screen and (max-width: 768px) {

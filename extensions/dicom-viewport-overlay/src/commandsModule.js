@@ -1,14 +1,14 @@
-const commandsModule = ({ commandsManager }) => {
+const commandsModule = () => {
   const definitions = {
     overlayVisible: {
       commandFn: ({ evt }) => {
-        const isVisible = evt
-        const overlayDom = document.querySelector('.ViewportOverlay')
+        const isVisible = evt;
+        const overlayDom = document.querySelector('.ViewportOverlay');
         if (overlayDom) {
-          overlayDom.style.display = isVisible ? 'block' : 'none'
+          overlayDom.style.display = isVisible ? 'block' : 'none';
         }
       },
-    }
+    },
   };
 
   return {

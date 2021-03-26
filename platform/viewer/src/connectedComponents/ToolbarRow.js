@@ -140,8 +140,8 @@ class ToolbarRow extends Component {
       this.setState(
         {
           toolbarButtons: _getVisibleToolbarButtons.call(this),
-        },
-        this.closeCineDialogIfNotApplicable
+        }
+        // this.closeCineDialogIfNotApplicable
       );
     }
   }

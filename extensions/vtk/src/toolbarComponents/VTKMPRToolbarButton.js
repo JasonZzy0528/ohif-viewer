@@ -8,10 +8,13 @@ const { studyMetadataManager } = utils;
 
 let isVisible = true;
 
-const _isDisplaySetReconstructable = (viewportSpecificData = {}, activeViewportIndex) => {
+const _isDisplaySetReconstructable = (
+  viewportSpecificData = {},
+  activeViewportIndex
+) => {
   if (!viewportSpecificData[activeViewportIndex]) {
     return false;
-  };
+  }
 
   const { displaySetInstanceUID, StudyInstanceUID } = viewportSpecificData[
     activeViewportIndex
@@ -27,7 +30,9 @@ const _isDisplaySetReconstructable = (viewportSpecificData = {}, activeViewportI
     return false;
   }
 
-  const displaySet = study._displaySets.find(set => set.displaySetInstanceUID === displaySetInstanceUID);
+  const displaySet = study._displaySets.find(
+    set => set.displaySetInstanceUID === displaySetInstanceUID
+  );
 
   if (!displaySet) {
     return false;
@@ -45,33 +50,43 @@ const _isDisplaySetReconstructable = (viewportSpecificData = {}, activeViewportI
     const image = displaySet.images[ii];
     if (!image) continue;
 
-    const imageIdControl = image.getImageId()
-    const instanceMetadataControl = cornerstone.metaData.get('instance', imageIdControl)
+    const imageIdControl = image.getImageId();
+    const instanceMetadataControl = cornerstone.metaData.get(
+      'instance',
+      imageIdControl
+    );
 
-    if (!instanceMetadataControl ||
+    if (
+      !instanceMetadataControl ||
       instanceMetadataControl === undefined ||
       !instanceMetadataControl.ImagePositionPatient ||
-      instanceMetadataControl.ImagePositionPatient === undefined) {
+      instanceMetadataControl.ImagePositionPatient === undefined
+    ) {
       // if ImagePositionPatient is missing, skip the 4D datasets check.
       // do not return false, because it could be a 3D dataset.
       continue;
     }
 
-    let xImagePositionPatientControl = instanceMetadataControl.ImagePositionPatient[0];
-    let yImagePositionPatientControl = instanceMetadataControl.ImagePositionPatient[1];
-    let zImagePositionPatientControl = instanceMetadataControl.ImagePositionPatient[2];
+    let xImagePositionPatientControl =
+      instanceMetadataControl.ImagePositionPatient[0];
+    let yImagePositionPatientControl =
+      instanceMetadataControl.ImagePositionPatient[1];
+    let zImagePositionPatientControl =
+      instanceMetadataControl.ImagePositionPatient[2];
 
     for (let jj = ii + 1; jj < displaySet.numImageFrames; ++jj) {
       const image = displaySet.images[jj];
       if (!image) continue;
 
-      const imageId = image.getImageId()
-      const instanceMetadata = cornerstone.metaData.get('instance', imageId)
+      const imageId = image.getImageId();
+      const instanceMetadata = cornerstone.metaData.get('instance', imageId);
 
-      if (!instanceMetadata ||
+      if (
+        !instanceMetadata ||
         instanceMetadata === undefined ||
         !instanceMetadata.ImagePositionPatient ||
-        instanceMetadata.ImagePositionPatient === undefined) {
+        instanceMetadata.ImagePositionPatient === undefined
+      ) {
         // if ImagePositionPatient is missing, skip the 4D datasets check.
         // do not return false, because it could be a 3D dataset.
         continue;
@@ -81,9 +96,11 @@ const _isDisplaySetReconstructable = (viewportSpecificData = {}, activeViewportI
       let yImagePositionPatient = instanceMetadata.ImagePositionPatient[1];
       let zImagePositionPatient = instanceMetadata.ImagePositionPatient[2];
 
-      if (xImagePositionPatientControl === xImagePositionPatient &&
+      if (
+        xImagePositionPatientControl === xImagePositionPatient &&
         yImagePositionPatientControl === yImagePositionPatient &&
-        zImagePositionPatientControl === zImagePositionPatient) {
+        zImagePositionPatientControl === zImagePositionPatient
+      ) {
         return false;
       }
     }
@@ -108,12 +125,12 @@ function VTKMPRToolbarButton({
     return {
       viewportSpecificData,
       activeViewportIndex,
-    }
+    };
   });
 
   isVisible = _isDisplaySetReconstructable(
     viewportSpecificData,
-    activeViewportIndex,
+    activeViewportIndex
   );
 
   return (
@@ -141,3 +158,4 @@ VTKMPRToolbarButton.propTypes = {
 };
 
 export default VTKMPRToolbarButton;
+export { _isDisplaySetReconstructable };

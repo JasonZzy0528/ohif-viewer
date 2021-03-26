@@ -1,5 +1,6 @@
 import SlabThicknessToolbarComponent from './toolbarComponents/SlabThicknessToolbarComponent';
 import VTKMPRToolbarButton from './toolbarComponents/VTKMPRToolbarButton';
+import CustomToolbarComponent from './toolbarComponents/CustomToolbarComponent';
 
 const TOOLBAR_BUTTON_TYPES = {
   COMMAND: 'command',
@@ -131,11 +132,41 @@ const definitions = [
     id: '2DMPR',
     label: '2D MPR',
     icon: 'cube',
-    //
+    context: 'ACTIVE_VIEWPORT::CORNERSTONE',
     CustomComponent: VTKMPRToolbarButton,
     type: TOOLBAR_BUTTON_TYPES.COMMAND,
     commandName: 'mpr2d',
+  },
+  {
+    id: 'customToolbarChangeThickness',
+    label: 'Slab Thickness',
+    icon: 'soft-tissue',
+    CustomComponent: CustomToolbarComponent,
     context: 'ACTIVE_VIEWPORT::CORNERSTONE',
+    actionButton: {
+      id: 'setSlabThickness',
+      label: 'slider',
+    },
+    deactivateButton: {
+      id: 'setBlendModeToComposite',
+      type: TOOLBAR_BUTTON_TYPES.SET_TOOL_ACTIVE,
+      commandName: 'setBlendModeToComposite',
+      commandOptions: {},
+    },
+    operationButtons: [
+      {
+        id: 'setBlendModeToMaximumIntensity',
+        label: 'MIP',
+      },
+      {
+        id: 'setBlendModeToMinimumIntensity',
+        label: 'MinIP',
+      },
+      {
+        id: 'setBlendModeToAverageIntensity',
+        label: 'AvgIP',
+      },
+    ],
   },
 ];
 

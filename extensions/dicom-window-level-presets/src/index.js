@@ -6,14 +6,14 @@ const extension = {
   /**
    * Only required property. Should be a unique value across all extensions.
    */
-  id: 'viewport-overlay',
+  id: 'customized-window-level-presets',
   version,
 
   getToolbarModule() {
     return toolbarModule;
   },
-  getCommandsModule() {
-    return commandsModule();
+  getCommandsModule({ commandsManager, servicesManager }) {
+    return commandsModule({ commandsManager });
   },
 };
 
