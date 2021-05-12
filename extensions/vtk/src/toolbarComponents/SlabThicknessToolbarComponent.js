@@ -1,11 +1,9 @@
 /* eslint-disable */
-import React, { useState, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux'
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Range, Checkbox, OldSelect } from '@ohif/ui';
 
-import { KEYS, ACTIONS, EXTENSION_NAME } from '../utils/reduxConstants'
 import './slab-thickness-toolbar-button.styl';
 
 const SLIDER = {
@@ -86,7 +84,6 @@ const _applySlabThickness = (
   modeChecked,
   toolbarClickCallback,
   button,
-  delay
 ) => {
   if (!modeChecked || !toolbarClickCallback) {
     return;
@@ -105,19 +102,14 @@ const _applySlabThickness = (
     return generatedOperation;
   };
   const operation = generateOperation(actionButton, value);
-  if (delay) {
-    setTimeout(() => toolbarClickCallback(operation), 1000)
-  } else {
-    toolbarClickCallback(operation)
-  }
+  toolbarClickCallback(operation)
 };
 
 const _applyModeOperation = (
   operation,
   modeChecked,
   toolbarClickCallback,
-  button,
-  delay
+  button
 ) => {
   // in case modeChecked has not being triggered by user yet
   if (typeof modeChecked !== 'boolean') {
@@ -128,24 +120,11 @@ const _applyModeOperation = (
 
   const _operation = modeChecked ? operation : deactivateButton;
   if (toolbarClickCallback && _operation) {
-    if (delay) {
-      setTimeout(() => toolbarClickCallback(_operation), 1000)
-    } else {
-      toolbarClickCallback(_operation);
-    }
+    toolbarClickCallback(_operation);
   }
 };
 
-const _getInitialState = (currentSelectedOption, extensionData) => {
-  if (extensionData) {
-    return {
-      value: extensionData[KEYS.VALUE],
-      sliderMin: SLIDER.MIN,
-      sliderMax: SLIDER.MAX,
-      modeChecked: extensionData[KEYS.MODE_CHECKED],
-      operation: currentSelectedOption,
-    };
-  }
+const _getInitialState = (currentSelectedOption) => {
   return {
     value: SLIDER.MIN,
     sliderMin: SLIDER.MIN,
@@ -157,30 +136,11 @@ const _getInitialState = (currentSelectedOption, extensionData) => {
 
 const INITIAL_OPTION_INDEX = 0;
 
-const _getInitialtSelectedOption = (button = {}, extensionData) => {
-  let index
-  if (extensionData && extensionData[KEYS.OPTION_ID] !== undefined) {
-    const option = button.operationButtons.find(button => button.id === extensionData[KEYS.OPTION_ID])
-    if (option) {
-      return option
-    }
-  }
+const _getInitialtSelectedOption = (button = {}) => {
   return (
     button.operationButtons && button.operationButtons[INITIAL_OPTION_INDEX]
   );
 };
-
-const _setExtensionData = ({ id, value, modeChecked }) => {
-  return {
-    type: ACTIONS.SET_EXTENSION_DATA,
-    extension: EXTENSION_NAME,
-    data: {
-      [KEYS.OPTION_ID]: id,
-      [KEYS.VALUE]: value,
-      [KEYS.MODE_CHECKED]: modeChecked
-    }
-  }
-}
 
 function SlabThicknessToolbarComponent({
   parentContext,
@@ -190,13 +150,10 @@ function SlabThicknessToolbarComponent({
   isActive,
   className,
 }) {
-  const vtkExtensionData = useSelector(state => state.extensions[EXTENSION_NAME])
-  const dispatch = useDispatch()
 
-  const currentSelectedOption = _getInitialtSelectedOption(button, vtkExtensionData);
-  const [state, setState] = useState(_getInitialState(currentSelectedOption, vtkExtensionData));
-  const [isMounted, setIsMounted] = useState(false)
-  const prevIsMounted = useRef(isMounted)
+  const currentSelectedOption = _getInitialtSelectedOption(button);
+  const [state, setState] = useState(_getInitialState(currentSelectedOption));
+
   const { label, operationButtons } = button;
   const _className = _getClassNames(isActive, className);
   const selectOptions = _getSelectOptions(button);
@@ -226,63 +183,26 @@ function SlabThicknessToolbarComponent({
   }
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    _applyModeOperation(
+      state.operation,
+      state.modeChecked,
+      toolbarClickCallback,
+      button
+    );
+  }, [state.modeChecked, state.operation]);
 
   useEffect(() => {
-    if (isMounted) {
-      if (!prevIsMounted.current) {
-        _applyModeOperation(
-          state.operation,
-          state.modeChecked,
-          toolbarClickCallback,
-          button,
-          true
-        );
-      } else {
-        _applyModeOperation(
-          state.operation,
-          state.modeChecked,
-          toolbarClickCallback,
-          button
-        );
-      }
-    }
-  }, [state.modeChecked, state.operation, isMounted]);
-
-  useEffect(() => {
-    if (isMounted) {
-      if (!prevIsMounted.current) {
-        _applySlabThickness(
-          state.value,
-          state.modeChecked,
-          toolbarClickCallback,
-          button,
-          true
-        );
-      } else {
-        _applySlabThickness(
-          state.value,
-          state.modeChecked,
-          toolbarClickCallback,
-          button
-        );
-      }
-      const value = state.value
-      const id = state.operation.id
-      const modeChecked = state.modeChecked
-      dispatch(_setExtensionData({ id, value, modeChecked }))
-    }
+    _applySlabThickness(
+      state.value,
+      state.modeChecked,
+      toolbarClickCallback,
+      button
+    );
   }, [
     state.operation,
     state.modeChecked,
-    state.value,
-    isMounted
+    state.value
   ]);
-
-  useEffect(() => {
-    prevIsMounted.current = isMounted
-  }, [isMounted])
 
   return (
     <div className={_className}>

@@ -14,15 +14,6 @@ class Range extends Component {
     if (this.props.onChange) this.props.onChange(event);
   };
 
-  componentDidUpdate(prevProps) {
-    const _self = this;
-    if (prevProps.value !== _self.props.value) {
-      if (_self.props.value !== _self.state.value) {
-        _self.setState({ value: _self.props.value });
-      }
-    }
-  }
-
   render() {
     return (
       <>
